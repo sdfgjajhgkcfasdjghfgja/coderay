@@ -1,0 +1,6 @@
+{
+  "name": "CodeXRay",
+  "description": "Code intelligence platform for codebase visualization and analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
