@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 
@@ -15,7 +16,9 @@ async function startServer() {
   app.post("/api/analyze", async (req, res) => {
     const { fileNames } = req.body;
     try {
-      const prompt = `Analyze these project files: ${fileNames.join(', ')}. Identify potential risks, tech debt, and architecture bottlenecks.`;
+      const prompt = `Analyze these project files: ${fileNames.join(', ')}. 
+      Identify architectural patterns, detect anti-patterns, evaluate scalability and maintainability, and suggest architectural improvements.
+      Also, briefly identify potential risks, tech debt, and bottlenecks.`;
       const result = await ai.models.generateContent({
         model: 'gemini-1.5-flash',
         contents: prompt,
@@ -55,6 +58,8 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+    console.log("Reading:", distPath);
+    console.log("Exists:", fs.existsSync(distPath));
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
