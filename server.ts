@@ -3,6 +3,8 @@ import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import { Indexer } from "./src/indexing/indexer";
+import { Retriever } from "./src/engines/retriever";
 
 async function startServer() {
   const app = express();
@@ -11,8 +13,24 @@ async function startServer() {
 
   // Gemini Setup
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+  const indexer = new Indexer();
 
   // API routes
+  app.post("/api/index", async (req, res) => {
+    const { files } = req.body; // { path: string, content: string }[]
+    for (const file of files) {
+      await indexer.indexFile(file.path, file.content);
+    }
+    res.json({ status: "indexed" });
+  });
+
+  app.post("/api/search", async (req, res) => {
+    const { query } = req.body;
+    const retriever = new Retriever(indexer.getGraph());
+    const results = await retriever.search(query);
+    res.json({ results });
+  });
+
   app.post("/api/analyze", async (req, res) => {
     const { fileNames } = req.body;
     try {
@@ -31,10 +49,15 @@ async function startServer() {
   });
 
   app.post("/api/chat", async (req, res) => {
-    const { messages, codebaseContext } = req.body;
+    const { messages, query } = req.body;
     
     try {
-      const prompt = `You are an expert AI coding assistant for CodeXRay. You have context about the codebase: ${codebaseContext}. 
+      const retriever = new Retriever(indexer.getGraph());
+      const contextNodes = await retriever.search(query);
+      const context = contextNodes.map(n => `File: ${n.filePath}, Symbol: ${n.name}, Type: ${n.type}`).join('\n');
+      
+      const prompt = `You are an expert AI coding assistant for CodeXRay. You have context about the codebase: ${context}. 
+      Current question: ${query}
       Current conversation: ${messages.map((m: any) => `${m.role}: ${m.content}`).join('\n')}`;
       
       const result = await ai.models.generateContent({
