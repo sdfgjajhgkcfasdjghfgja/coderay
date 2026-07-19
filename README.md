@@ -49,9 +49,9 @@ CodeXRay provides industry-leading performance for large-scale codebase analysis
 
 ---
 
-## Demo
+## Demo Mode
 
-Live demo available for qualified enterprise partners. Please contact our sales team at [sales@codexray.ai](mailto:sales@codexray.ai).
+Try CodeXRay immediately in Demo Mode. Load our sample repository to visualize architectural relationships, explore technical debt metrics, and test AI-driven codebase reasoning.
 
 ---
 

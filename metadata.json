@@ -1,6 +1,6 @@
 {
   "name": "CodeXRay",
-  "description": "Code intelligence platform for codebase visualization and analysis.",
+  "description": "Production-grade repository intelligence platform mirroring VS Code capabilities",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
